@@ -190,10 +190,58 @@ values (${q(id)}, ${q(e.title)}, ${q(e.description)}, ${q(e.start)}, ${q(e.end)}
   return out.join('\n') + '\n';
 }
 
+// ---------------------------------------------------------------------------
+// public/data/offline-snapshot.json (modo demo sin servidor, solo lectura)
+// ---------------------------------------------------------------------------
+function buildOffline() {
+  const slugs = new Set();
+  const slugFor = (name) => { let b = slugify(name); let s2 = b; let n = 1; while (slugs.has(s2)) s2 = `${b}-${++n}`; slugs.add(s2); return s2; };
+  const entities = [];
+  for (const e of demo.entities) {
+    entities.push({ id: stableUuid('entity:' + e.key), kind: e.kind, slug: slugFor(e.name), name: e.name, initials: e.initials, color: e.color,
+      photo_path: null, image_url: null, genres: e.genres ?? [], area: e.area ?? null, municipality: e.municipality ?? 'València', data_origin: 'demo', tagline: e.tagline ?? null });
+  }
+  for (const p of snapshot.profiles) {
+    if (validateImportedProfile(p)) continue;
+    entities.push({ id: stableUuid('imported-entity:' + p.id), kind: p.role === 'Sala' ? 'venue' : 'dj', slug: slugFor(p.name), name: p.name,
+      initials: p.initials, color: p.color, photo_path: null, image_url: p.imageURL || null,
+      genres: p.genre && p.genre !== 'Programación publicada' ? [p.genre] : [], area: p.area ?? null, municipality: null, data_origin: 'imported', tagline: null });
+  }
+  const base = { until_late: false, time_warning: null, room: null, location_precision: 'organizer-pin', source_genres: [], price_note: null,
+    ticket_url: null, ticket_provider_id: null, poster_path: null, poster_url: null, video_path: null, age: null, status: 'published',
+    import_batch_id: null, sources: [], verified_at: null };
+  const events = [];
+  for (const ev of demo.events) {
+    events.push({ ...base, id: stableUuid('event:' + ev.key), title: ev.title, description: ev.description,
+      relative: { day: ev.day, start: ev.start, endDay: ev.endDay ?? ev.day, end: ev.end },
+      venue_entity_id: ev.venue ? stableUuid('entity:' + ev.venue) : null, venue_name: ev.venueName, address: ev.address, area: ev.area,
+      municipality: ev.municipality ?? 'València', province: ev.province ?? 'Valencia', lat: ev.lat, lng: ev.lng, genre: ev.genre,
+      price: ev.price, price_kind: 'fixed', poster_style: ev.poster, organizer_entity_id: stableUuid('entity:' + ev.organizer), data_origin: 'demo',
+      event_artists: (ev.djs ?? []).map((d, i) => ({ entity_id: stableUuid('entity:' + d), position: i, hidden_by_artist: false })) });
+  }
+  const batchId = stableUuid('import:' + snapshot.meta.revision);
+  const profileIds = new Set(snapshot.profiles.map((p) => p.id));
+  for (const e of snapshot.events) {
+    if (validateImportedEvent(e)) continue;
+    events.push({ ...base, id: stableUuid('imported-event:' + e.sourceEventKey), title: e.title, description: e.description,
+      starts_at: new Date(e.start).toISOString(), ends_at: new Date(e.end).toISOString(), until_late: e.isUntilLate, time_warning: e.timeWarning,
+      venue_entity_id: profileIds.has(e.venueId) ? stableUuid('imported-entity:' + e.venueId) : null, venue_name: e.venue, room: e.room || null,
+      address: e.address, area: e.area, municipality: e.municipality, province: e.province, lat: e.lat, lng: e.lng, location_precision: 'source-coordinates',
+      genre: e.genre, source_genres: e.sourceGenres, price: e.price ?? null, price_kind: e.price === null || e.price === undefined ? 'unknown' : e.priceKind,
+      price_note: e.priceNote, ticket_url: e.ticket || null, ticket_provider_id: e.sourceEventKey.startsWith('xceed:') ? 'xceed' : 'fourvenues',
+      poster_url: e.posterURL || null, poster_style: e.poster || 'groove', age: e.age == null ? null : String(e.age), organizer_entity_id: null,
+      data_origin: 'imported', import_batch_id: batchId, sources: e.sources, verified_at: e.verifiedAt || snapshot.meta.retrievedAt,
+      event_artists: (e.djs || []).filter((d) => profileIds.has(d)).map((d, i) => ({ entity_id: stableUuid('imported-entity:' + d), position: i, hidden_by_artist: false })) });
+  }
+  return { generatedAt: new Date().toISOString(), note: 'Modo demo sin servidor: solo lectura.', importMeta: snapshot.meta, entities, events };
+}
+
 const seedsDir = join(root, 'supabase/seeds');
 mkdirSync(seedsDir, { recursive: true });
 const demoSql = buildDemo();
 const importedSql = buildImported();
 writeFileSync(join(seedsDir, '01_demo.sql'), demoSql);
 writeFileSync(join(seedsDir, '02_imported.sql'), importedSql);
-console.log(`Escrito supabase/seeds/01_demo.sql (${demoSql.length} B) y 02_imported.sql (${importedSql.length} B)`);
+mkdirSync(join(root, 'public/data'), { recursive: true });
+writeFileSync(join(root, 'public/data/offline-snapshot.json'), JSON.stringify(buildOffline()));
+console.log(`Escrito public/data/offline-snapshot.json, supabase/seeds/01_demo.sql (${demoSql.length} B) y 02_imported.sql (${importedSql.length} B)`);
