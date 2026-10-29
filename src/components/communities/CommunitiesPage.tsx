@@ -22,7 +22,6 @@ export function CommunitiesPage() {
     setError('');
     fetchCommunities(db).then(setItems).catch((e) => setError((e as Error).message));
   };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(load, [db]);
 
   const found = useMemo(() => {

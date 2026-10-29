@@ -1,5 +1,5 @@
 // Referidos e invitaciones de House Arena (campaña de simulación) contra Supabase local.
-import { describe, expect, it, beforeAll } from 'vitest';
+import { describe, expect, it, beforeAll, afterAll } from 'vitest';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { anon, communityBySlug, demoUser, freshUser, opKey } from './helpers';
 
@@ -14,6 +14,13 @@ describe('referidos e invitaciones', () => {
     communityId = c.id;
     const { data } = await anon().from('referral_campaigns').select('id').eq('community_id', c.id).eq('is_demo', true).single();
     campaignId = data!.id;
+  });
+
+  // Las campañas creadas por las pruebas se cierran al terminar para no ensuciar la demo.
+  const createdIds: string[] = [];
+  afterAll(async () => {
+    const admin = await demoUser('arena');
+    for (const id of createdIds) await admin.client.from('referral_campaigns').update({ status: 'closed' }).eq('id', id);
   });
 
   async function newReferrer() {
@@ -125,6 +132,7 @@ describe('referidos e invitaciones', () => {
     const created = await admin.client.rpc('create_campaign', { p_community: communityId, p_name: `Campaña reglas ${Date.now()}`, p_base: 5, p_step: 10 });
     expect(created.error).toBeNull();
     const camp = created.data as string;
+    createdIds.push(camp);
     const u = await freshUser('Reglas');
     await u.client.rpc('join_community', { p_community: communityId });
     const link = await u.client.rpc('get_or_create_referral_link', { p_campaign: camp });
@@ -146,6 +154,7 @@ describe('referidos e invitaciones', () => {
   it('no se mezclan compras entre campañas ni se usan enlaces ajenos', async () => {
     const admin = await demoUser('arena');
     const other = await admin.client.rpc('create_campaign', { p_community: communityId, p_name: `Otra campaña ${Date.now()}` });
+    createdIds.push(other.data as string);
     const u = await newReferrer();
     const cross = await u.client.rpc('simulate_purchase', { p_campaign: other.data, p_link_code: u.code, p_quantity: 1, p_idempotency_key: opKey() });
     expect(cross.error?.message).toMatch(/no pertenece a esta campaña/);

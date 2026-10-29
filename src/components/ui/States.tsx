@@ -64,7 +64,7 @@ export function NeedsLogin({ next, children }: { next: string; children?: ReactN
 
 export function NoBackend({ feature }: { feature: string }) {
   return (
-    <Empty title={`${feature} necesita el servidor`} icon="lock">
+    <Empty title={`${feature}: requiere el servidor`} icon="lock">
       Esta instalación está en <strong>modo demo sin servidor</strong>: no hay cuentas ni datos compartidos. Configura Supabase
       (ver README) para usar {feature.toLowerCase()} con usuarios reales.
     </Empty>

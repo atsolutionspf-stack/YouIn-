@@ -19,7 +19,6 @@ export function Poster({ event, className }: { event: Pick<DiscoveryEvent, 'titl
   const [failed, setFailed] = useState(false);
   const src = failed ? '/brand/poster-unavailable.svg' : posterSrc(event);
   return (
-    // eslint-disable-next-line @next/next/no-img-element
     <img
       className={className}
       src={src}

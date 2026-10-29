@@ -1,7 +1,7 @@
 // Reglas de descubrimiento: filtros, búsqueda, agrupación por ubicación,
 // precio y procedencia de los datos. Sin dependencias de interfaz ni de red.
 import type { DiscoveryEvent, EntitySummary, SourceLink } from '@/lib/types';
-import { formatDate, matchesNightKeys, presetNightKeys, type DatePreset } from './time';
+import { formatDate, isHappeningNow, matchesNightKeys, presetNightKeys, type DatePreset } from './time';
 
 export const GENRES = ['House', 'Techno', 'Disco', 'Reggaetón', 'En directo', 'Sin clasificar'] as const;
 export const PRICE_OPTIONS = [
@@ -90,6 +90,8 @@ export function filterEvents(
     .filter((e) => e.status === 'published')
     .filter((e) => matchesOrigin(e, f.origin))
     .filter((e) => matchesNightKeys(e, keys, now))
+    // "Ahora": solo eventos en curso con horario fiable (no los marcados para revisar ni "hasta cierre").
+    .filter((e) => f.date !== 'now' || (isHappeningNow(e, now) && !e.until_late))
     .filter((e) => f.genre === 'Todos' || e.genre === f.genre)
     .filter((e) => matchesPrice(e, f.price, f.includeUnknownPrice))
     .filter((e) => !f.municipality || normalize(e.municipality) === normalize(f.municipality))

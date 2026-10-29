@@ -232,7 +232,7 @@ export function ChatRoom({ communityId, channel, canWrite, isAdmin, adminIds, on
               <small title={formatDateTime(m.created_at)}>
                 {m.pending ? 'Enviando…' : m.failed ? `No enviado: ${m.failed}` : <time dateTime={m.created_at}>{formatMessageTime(m.created_at)}</time>}
               </small>
-              {!m.deleted_at && !m.pending && (
+              {!m.deleted_at && !m.pending && (m.failed || (m.id > 0 && (mine || isAdmin))) && (
                 <span className="msg-actions">
                   {m.failed && <button onClick={() => { setMessages((c) => c.map((x) => x.client_id === m.client_id ? { ...x, failed: undefined, pending: true } : x)); void deliver(m); }}>Reintentar</button>}
                   {m.failed && <button onClick={() => setMessages((c) => c.filter((x) => x.client_id !== m.client_id))}>Descartar</button>}

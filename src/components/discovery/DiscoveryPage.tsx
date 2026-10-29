@@ -27,10 +27,10 @@ const EventMap = dynamic(() => import('@/components/map/EventMap').then((m) => m
 });
 
 const PAGE = 12;
-const DATE_CHIPS: [DatePreset, string][] = [['all', 'Próximos'], ['today', 'Hoy'], ['tomorrow', 'Mañana'], ['weekend', 'Este finde']];
+const DATE_CHIPS: [DatePreset, string][] = [['all', 'Próximos'], ['now', 'Ahora'], ['today', 'Hoy'], ['tomorrow', 'Mañana'], ['weekend', 'Este finde']];
 
 function filtersFromParams(p: URLSearchParams): EventFilters {
-  const date = (['all', 'today', 'tomorrow', 'weekend', 'custom'].includes(p.get('fecha') ?? '') ? p.get('fecha') : 'all') as DatePreset;
+  const date = (['all', 'now', 'today', 'tomorrow', 'weekend', 'custom'].includes(p.get('fecha') ?? '') ? p.get('fecha') : 'all') as DatePreset;
   const price = (PRICE_OPTIONS.some((o) => o.value === p.get('precio')) ? p.get('precio') : 'any') as PriceFilter;
   return {
     ...DEFAULT_FILTERS,
@@ -174,7 +174,7 @@ export function DiscoveryPage() {
   ].filter(Boolean) as { key: string; label: string; clear: Partial<EventFilters> }[];
 
   const detailEvent = detailId ? events.find((e) => e.id === detailId) : null;
-  const periodLabel = { all: 'por descubrir', today: 'hoy', tomorrow: 'mañana', weekend: 'este finde', custom: 'en esas fechas' }[filters.date];
+  const periodLabel = { all: 'por descubrir', now: 'en curso', today: 'hoy', tomorrow: 'mañana', weekend: 'este finde', custom: 'en esas fechas' }[filters.date];
 
   return (
     <>

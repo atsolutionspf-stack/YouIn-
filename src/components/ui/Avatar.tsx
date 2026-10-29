@@ -8,7 +8,6 @@ export function Avatar({ p, size }: { p: AvatarSource; size?: number }) {
   const style = size ? { width: size, height: size, fontSize: Math.round(size / 3) } : undefined;
   if (src) {
     // Imágenes externas de las fuentes importadas: no se optimizan con next/image.
-    // eslint-disable-next-line @next/next/no-img-element
     return <img className="avatar photo-avatar" src={src} alt={`Foto de ${p.name}`} loading="lazy" referrerPolicy="no-referrer" style={style} />;
   }
   const initials = (p.initials || p.name.slice(0, 2)).toUpperCase();

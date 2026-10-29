@@ -57,13 +57,14 @@ export function nightDateKey(d: Date | string | number): string {
   return madridDateKey(+new Date(d) - NIGHT_CUTOFF_HOURS * 3600_000);
 }
 
-export type DatePreset = 'all' | 'today' | 'tomorrow' | 'weekend' | 'custom';
+export type DatePreset = 'all' | 'now' | 'today' | 'tomorrow' | 'weekend' | 'custom';
 
 /** Jornadas (AAAA-MM-DD) incluidas en un filtro rápido. */
 export function presetNightKeys(preset: DatePreset, now: Date = new Date(), custom?: { from?: string; to?: string }): string[] | null {
   const today = nightDateKey(now);
   switch (preset) {
     case 'all':
+    case 'now':
       return null;
     case 'today':
       return [today];

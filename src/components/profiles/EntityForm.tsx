@@ -149,11 +149,10 @@ export function EntityForm({ entity, onSaved }: { entity: EntityRow; onSaved?: (
       </label>
       <div className="dj-style-preview dj-personalized" style={profileStyle({ accent, profile_font: font })} aria-label="Vista previa">
         <div className="dj-cover">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          { }
           {previews.cover || mediaUrl(entity.cover_path) ? <img src={previews.cover || mediaUrl(entity.cover_path)} alt="" /> : <span>◌</span>}
         </div>
         {previews.photo ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img className="avatar photo-avatar" src={previews.photo} alt="" />
         ) : <Avatar p={{ ...entity, name }} />}
         <h3>{name}</h3>

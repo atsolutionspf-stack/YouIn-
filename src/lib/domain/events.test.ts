@@ -37,6 +37,12 @@ describe('filterEvents', () => {
     expect(filterEvents([tonight, tomorrow], { ...DEFAULT_FILTERS, date: 'today' }, entities, now).map((e) => e.id)).toEqual([tonight.id]);
     expect(filterEvents([tonight, tomorrow], { ...DEFAULT_FILTERS, date: 'tomorrow' }, entities, now).map((e) => e.id)).toEqual([tomorrow.id]);
   });
+  it('"Ahora" solo muestra eventos en curso con horario fiable', () => {
+    const live = ev({ starts_at: '2026-10-29T10:00:00Z', ends_at: '2026-10-29T14:00:00Z' });
+    const unsure = ev({ starts_at: '2026-10-29T10:00:00Z', ends_at: '2026-10-29T14:00:00Z', time_warning: 'revisar' });
+    const later = ev({});
+    expect(filterEvents([live, unsure, later], { ...DEFAULT_FILTERS, date: 'now' }, entities, now).map((e) => e.id)).toEqual([live.id]);
+  });
   it('cerca de mí usa la distancia real y excluye eventos sin coordenadas', () => {
     const near = ev({ lat: 39.47, lng: -0.376 });
     const far = ev({ lat: 38.34, lng: -0.49 });

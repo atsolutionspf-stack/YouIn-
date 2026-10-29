@@ -6,7 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
+    "test:e2e": "playwright test",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:seed:build": "node scripts/build-seed.mjs",
+    "db:types": "supabase gen types typescript --local > src/lib/database.types.ts",
+    "db:refresh-demo": "node --env-file=.env.local scripts/refresh-demo-dates.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -33,5 +43,8 @@
     "supabase": "^2.122.0",
     "typescript": "^5",
     "vitest": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=20.9"
   }
 }

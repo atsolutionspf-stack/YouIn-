@@ -29,13 +29,11 @@ function Nav({ type }: { type: 'desktop-nav' | 'bottom-nav' }) {
         const active = isActive(pathname, item.href);
         return (
           <Link key={item.href} href={item.href} className={active ? 'active' : ''} aria-current={active ? 'page' : undefined}>
-            <span className="nav-icon">
-              <Icon name={item.icon} />
-              {item.href === '/comunidades' && unreadTotal > 0 && (
-                <span className="unread-dot" aria-label={`${unreadTotal} mensajes sin leer`}>{unreadTotal > 99 ? '99+' : unreadTotal}</span>
-              )}
-            </span>
+            <span className="nav-icon"><Icon name={item.icon} /></span>
             <span>{item.label}</span>
+            {item.href === '/comunidades' && unreadTotal > 0 && (
+              <span className="unread-dot" aria-label={`${unreadTotal} mensajes sin leer`}>{unreadTotal > 99 ? '99+' : unreadTotal}</span>
+            )}
           </Link>
         );
       })}
@@ -52,7 +50,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="brandline">
           <Link className="brand" href="/" aria-label="YOU IN? · Inicio">
             {/* Logotipo original del piloto */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+            { }
             <img className="wordmark" src="/brand/logo.svg" alt="You In" />
           </Link>
           <span className="location"><Icon name="pin" size={16} /> Valencia y alrededores</span>

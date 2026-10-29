@@ -108,7 +108,7 @@ export function ProfileView({ slug }: { slug: string }) {
         <section className={`panel profile-hero dj-personalized ${p.profile_layout === 'compact' ? 'compact' : ''}`} style={profileStyle(p)}>
           {(isDj || cover) && (
             <div className="dj-cover">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+              { }
               {cover ? <img src={cover} alt={`Portada de ${p.name}`} /> : <span aria-hidden="true">◌</span>}
             </div>
           )}
