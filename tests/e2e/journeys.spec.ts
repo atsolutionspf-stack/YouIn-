@@ -147,9 +147,9 @@ test('referidos House Arena: límites, operación repetida y canje único', asyn
   await login(admin, 'arena@demo.youin.local');
   await admin.goto('/panel/house-arena-demo?tab=campanas');
   await admin.getByLabel('Código de invitación').fill(code);
-  await admin.getByRole('button', { name: 'Canjear', exact: true }).click();
+  await admin.locator('form', { has: admin.getByLabel('Código de invitación') }).getByRole('button', { name: 'Canjear', exact: true }).click();
   await expect(admin.locator('#toast')).toContainText('Invitación canjeada');
   await admin.getByLabel('Código de invitación').fill(code);
-  await admin.getByRole('button', { name: 'Canjear', exact: true }).click();
+  await admin.locator('form', { has: admin.getByLabel('Código de invitación') }).getByRole('button', { name: 'Canjear', exact: true }).click();
   await expect(admin.locator('#toast')).toContainText('ya se canjeó');
 });

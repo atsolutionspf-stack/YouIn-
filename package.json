@@ -16,14 +16,18 @@
     "db:reset": "supabase db reset",
     "db:seed:build": "node scripts/build-seed.mjs",
     "db:types": "supabase gen types typescript --local > src/lib/database.types.ts",
-    "db:refresh-demo": "node --env-file=.env.local scripts/refresh-demo-dates.mjs"
+    "db:refresh-demo": "node --env-file=.env.local scripts/refresh-demo-dates.mjs",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "^1.20.17",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",
     "leaflet": "^1.9.4",
     "leaflet.markercluster": "^1.5.3",
-    "next": "16.4.3",
+    "next": "^16.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "server-only": "^0.0.1",
@@ -38,11 +42,12 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.4.3",
+    "eslint-config-next": "^16.4.6",
     "pg": "^8.23.1",
     "supabase": "^2.122.0",
     "typescript": "^5",
-    "vitest": "^5.0.5"
+    "vitest": "^5.0.5",
+    "wrangler": "^4.164.0"
   },
   "engines": {
     "node": ">=20.9"
