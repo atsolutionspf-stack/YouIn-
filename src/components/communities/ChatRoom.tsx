@@ -125,6 +125,27 @@ export function ChatRoom({ communityId, channel, canWrite, isAdmin, adminIds, on
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [db, communityId, channel]);
 
+  // Red de seguridad del tiempo real: si la suscripción se queda colgada (cortes
+  // o reinicios del servicio), cada 15 s se añaden los mensajes que falten.
+  useEffect(() => {
+    if (!db) return;
+    const t = setInterval(async () => {
+      if (document.visibilityState !== 'visible') return;
+      try {
+        const page = await fetchMessages(db, communityId, channel);
+        setMessages((current) => {
+          const known = new Set(current.map((m) => m.id));
+          const knownClients = new Set(current.map((m) => m.client_id).filter(Boolean));
+          const fresh = page.messages.filter((m) => !known.has(m.id) && !(m.client_id && knownClients.has(m.client_id)));
+          const updated = current.map((m) => page.messages.find((p) => p.id === m.id) ?? m);
+          return fresh.length ? [...updated, ...fresh].sort((a, b) => (a.id < 0 ? 1 : b.id < 0 ? -1 : a.id - b.id)) : updated;
+        });
+        void ensureNames(page.messages);
+      } catch { /* se reintenta en el siguiente ciclo */ }
+    }, 15_000);
+    return () => clearInterval(t);
+  }, [db, communityId, channel, ensureNames]);
+
   // Desplazamiento: al final para mensajes nuevos; se conserva al cargar anteriores.
   useLayoutEffect(() => {
     const el = list.current;

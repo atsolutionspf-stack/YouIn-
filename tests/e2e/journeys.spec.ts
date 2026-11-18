@@ -29,7 +29,8 @@ test('dos usuarios distintos entran en una comunidad y conversan en tiempo real'
   const reply = `Respuesta de Bruno ${Date.now()}`;
   await b.getByLabel('Escribe un mensaje').fill(reply);
   await b.getByRole('button', { name: 'Enviar' }).click();
-  await expect(a.locator('.bubble', { hasText: reply })).toBeVisible();
+  // En directo o, si Realtime está arrancando, por la comprobación periódica (15 s).
+  await expect(a.locator('.bubble', { hasText: reply })).toBeVisible({ timeout: 25_000 });
 
   // Persisten tras recargar.
   await b.reload();
