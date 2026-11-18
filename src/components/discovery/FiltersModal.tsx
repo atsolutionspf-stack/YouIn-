@@ -1,7 +1,7 @@
 'use client';
 import { useState, type FormEvent } from 'react';
 import { Modal } from '@/components/ui/Modal';
-import { PRICE_OPTIONS, type EventFilters, type PriceFilter } from '@/lib/domain/events';
+import { GENRES, PRICE_OPTIONS, type EventFilters, type PriceFilter } from '@/lib/domain/events';
 import { madridDateKey } from '@/lib/domain/time';
 
 type Props = {
@@ -16,6 +16,7 @@ type Props = {
 
 export function FiltersModal({ open, onClose, filters, onApply, locations, nearActive, geoMessage }: Props) {
   const [municipality, setMunicipality] = useState(filters.municipality);
+  const [genre, setGenre] = useState(filters.genre);
   const areas = locations.find((l) => l.name === municipality)?.areas ?? [];
   const today = madridDateKey(new Date());
 
@@ -25,6 +26,8 @@ export function FiltersModal({ open, onClose, filters, onApply, locations, nearA
     const from = String(f.get('from') || '');
     const to = String(f.get('to') || '');
     onApply({
+      genre,
+      origin: f.get('demo') === 'on' ? 'demo' : 'published',
       municipality: String(f.get('municipality') || ''),
       area: String(f.get('area') || ''),
       price: String(f.get('price') || 'any') as PriceFilter,
@@ -36,9 +39,17 @@ export function FiltersModal({ open, onClose, filters, onApply, locations, nearA
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="Tu próximo plan, donde tú quieras">
+    <Modal open={open} onClose={onClose} title="Filtros">
       {geoMessage && <div className="notice warm" style={{ marginBottom: 16 }}>{geoMessage}</div>}
       <form onSubmit={submit} key={open ? 'open' : 'closed'}>
+        <fieldset className="plain">
+          <legend>Música</legend>
+          <div className="chips wrap" role="radiogroup" aria-label="Género musical">
+            {['Todos', ...GENRES].map((g) => (
+              <button key={g} type="button" role="radio" aria-checked={genre === g} className={`chip ${genre === g ? 'active' : ''}`} onClick={() => setGenre(g)}>{g}</button>
+            ))}
+          </div>
+        </fieldset>
         <fieldset className="plain">
           <legend>Fechas · jornada de 06:00 a 06:00</legend>
           <div className="form-grid">
@@ -74,6 +85,7 @@ export function FiltersModal({ open, onClose, filters, onApply, locations, nearA
             </select>
           </label>
         )}
+        <label><input type="checkbox" name="demo" defaultChecked={filters.origin === 'demo'} /> Ver solo eventos de demostración (ficticios)</label>
         <p className="help">Solo se listan municipios y zonas con eventos publicados. No se inventan precios: si la fuente no lo indica, figura como «Consultar».</p>
         <button className="primary full">Ver resultados</button>
       </form>

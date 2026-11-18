@@ -253,3 +253,26 @@ fieldset.plain legend { font-size: 12px; font-weight: 600; padding: 0 7px; }
 }
 .location { white-space: nowrap; }
 @media (max-width: 1420px) { .location { display: none; } }
+
+/* Portada simplificada: lo esencial a la vista, el resto en «Filtros» */
+.source-line { font-size: 12px; color: var(--muted); margin: -6px 0 6px; }
+.source-line .link, .source-line .text-button { font-size: 12px; padding: 0; }
+.chips.wrap { flex-wrap: wrap; overflow: visible; padding-bottom: 6px; }
+.filter-btn { position: relative; }
+.chip.near-on { background: var(--rust); border-color: var(--rust); color: #fff; }
+.mobile-only { display: none !important; }
+@media (min-width: 801px) {
+  .source-line { display: none; }
+}
+@media (max-width: 800px) {
+  .desktop-only { display: none !important; }
+  .mobile-only { display: inline-flex !important; }
+  .import-bar { display: none; }
+  .intro.compact-mobile h1 { display: none; }
+  .intro.compact-mobile { margin-bottom: 8px; }
+  .toolbar { flex-wrap: nowrap; margin-top: 8px; }
+  .toolbar .searchbox { flex: 1; min-width: 0; flex-basis: auto; }
+  .toolbar .filter-btn { flex-shrink: 0; padding: 12px 14px; }
+  .quick-dates .chip { min-height: 38px; display: inline-flex; align-items: center; gap: 6px; }
+  .view-toggle { margin-top: 2px; }
+}

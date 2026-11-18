@@ -165,6 +165,8 @@ export function DiscoveryPage() {
   }
 
   const activeExtra = [
+    filters.genre !== 'Todos' && { key: 'genre', label: filters.genre, clear: { genre: 'Todos' } },
+    filters.origin === 'demo' && { key: 'origin', label: 'Demo', clear: { origin: 'published' as const } },
     filters.municipality && { key: 'municipality', label: filters.municipality, clear: { municipality: '', area: '' } },
     filters.area && { key: 'area', label: filters.area, clear: { area: '' } },
     filters.price !== 'any' && { key: 'price', label: PRICE_OPTIONS.find((o) => o.value === filters.price)!.label, clear: { price: 'any' as PriceFilter } },
@@ -185,32 +187,40 @@ export function DiscoveryPage() {
         sub="Descubre dónde suena lo tuyo y con quién compartirlo."
       />
       <ProvenanceBar origin={filters.origin} onChange={(origin) => { update({ origin, municipality: '', area: '' }); setSelectedId(null); }} importedCount={importedCount} />
+      <p className="source-line">
+        {filters.origin === 'demo'
+          ? <>Viendo eventos de demostración (ficticios). <button className="text-button link" onClick={() => update({ origin: 'published', municipality: '', area: '' })}>Ver eventos reales</button></>
+          : <>{importedCount} eventos anunciados · datos del 19/10 · <Link className="link" href="/acerca#fuentes">Ver fuentes</Link></>}
+      </p>
 
       <div className="toolbar">
         <div className="searchbox">
           <Icon name="search" size={18} />
           <input
             type="search" value={filters.query} onChange={(e) => update({ query: e.target.value })}
-            placeholder="Busca evento, sala, DJ o colectivo…" aria-label="Buscar por evento, sala, DJ o colectivo" autoComplete="off"
+            placeholder="Busca fiesta, DJ o sala…" aria-label="Buscar por evento, sala, DJ o colectivo" autoComplete="off"
           />
         </div>
-        <button className={`pill near-btn ${filters.near ? 'active' : ''}`} onClick={nearMe} disabled={locating} aria-pressed={Boolean(filters.near)}>
+        <button className={`pill near-btn desktop-only ${filters.near ? 'active' : ''}`} onClick={nearMe} disabled={locating} aria-pressed={Boolean(filters.near)}>
           <Icon name="target" size={16} /> {locating ? 'Buscando…' : filters.near ? 'Cerca de mí ✕' : 'Cerca de mí'}
         </button>
-        <button className="iconbutton filter-btn" onClick={() => { setGeoMessage(''); setFiltersOpen(true); }} aria-label="Más filtros: fechas, ubicación y precio">
-          <Icon name="filter" />
+        <button className="pill filter-btn" onClick={() => { setGeoMessage(''); setFiltersOpen(true); }} aria-label={`Filtros${activeExtra.length ? ` (${activeExtra.length} activos)` : ''}`}>
+          <Icon name="filter" size={16} /> <span className="filter-label">Filtros</span>
           {activeExtra.length > 0 && <span className="filter-count">{activeExtra.length}</span>}
         </button>
       </div>
-      <div className="quick-dates" role="group" aria-label="Cuándo">
+      <div className="quick-dates" role="group" aria-label="Cuándo y dónde">
+        <button className={`chip mobile-only ${filters.near ? 'near-on' : ''}`} aria-pressed={Boolean(filters.near)} onClick={nearMe} disabled={locating}>
+          <Icon name="target" size={13} /> {locating ? 'Buscando…' : 'Cerca de mí'}
+        </button>
         {DATE_CHIPS.map(([value, label]) => (
           <button key={value} className="chip" aria-pressed={filters.date === value} onClick={() => update({ date: value, dateFrom: undefined, dateTo: undefined })}>{label}</button>
         ))}
-        <button className="chip" aria-pressed={filters.date === 'custom'} onClick={() => { setGeoMessage(''); setFiltersOpen(true); }}>
+        <button className="chip desktop-only" aria-pressed={filters.date === 'custom'} onClick={() => { setGeoMessage(''); setFiltersOpen(true); }}>
           <Icon name="calendar" size={13} /> Elegir fechas
         </button>
       </div>
-      <div className="chips" role="group" aria-label="Género musical">
+      <div className="chips desktop-only" role="group" aria-label="Género musical">
         {['Todos', ...GENRES].map((g) => (
           <button key={g} className={`chip ${filters.genre === g ? 'active' : ''}`} aria-pressed={filters.genre === g} onClick={() => update({ genre: g })}>{g}</button>
         ))}
